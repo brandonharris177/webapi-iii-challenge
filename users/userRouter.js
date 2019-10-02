@@ -28,21 +28,29 @@ router.get('/:id', validateUserId, (req, res) => {
     )
 });
 
-router.get('/:id/posts', (req, res) => {
-
+router.get('/:id/posts', validateUserId, (req, res) => {
+    const id = req.params.id
+    console.log('made it this far')
+    UserDB.getUserPosts(id)
+    .then(posts => {
+        res.status(200).json(posts)
+    }).catch(error =>
+        res.status(500).json({error: `Server Error ${error}`})
+    )
 });
 
 router.delete('/:id', validateUserId, (req, res) => {
     UserDB.getById(req.params.id)
     .then(user => {
         UserDB.remove(user)
-        res.status(201).json({Message: 'user deleted'})
+        res.status(204).json({Message: 'user deleted'})
     }).catch(error =>
     res.status(500).json({error: `Server error, could not delete user error: ${error}`})
     )
 });
 
 router.put('/:id', validateUserId, (req, res) => {
+    console.log('running validate userID')
     const id = req.params.id
     UserDB.update(id, req.body)
     .then (response => {
@@ -62,6 +70,7 @@ router.put('/:id', validateUserId, (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
+    console.log(`running validate user id`)
     const id = req.params.id
     // console.log(id)
     UserDB.getById(id)
