@@ -4,8 +4,13 @@ const router = express.Router();
 
 const UserDB = require('./userDb')
 
-router.post('/', (req, res) => {
-
+router.post('/', validateUser, (req, res) => {
+    UserDB.insert(req.body)
+    .then(newUser =>
+        res.status(201).json(newUser)
+    ).catch(error =>
+        res.status(500).json({error: `Server error could not create user error: ${error}`})
+    )
 });
 
 router.post('/:id/posts', (req, res) => {
@@ -70,7 +75,7 @@ router.put('/:id', validateUserId, (req, res) => {
 //custom middleware
 
 function validateUserId(req, res, next) {
-    console.log(`running validate user id`)
+    // console.log(`running validate user id`)
     const id = req.params.id
     // console.log(id)
     UserDB.getById(id)
@@ -87,7 +92,11 @@ function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
-
+    if (req.body.name) {
+        next ();
+    } else {
+        res.status(400).json({ message: "missing user data" })
+    }
 };
 
 function validatePost(req, res, next) {
