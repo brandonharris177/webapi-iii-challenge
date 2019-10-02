@@ -41,8 +41,32 @@ router.delete('/:id', (req, res) => {
 });
 
 router.put('/:id', (req, res) => {
-
-});
+    const id = req.params.id
+    console.log(id)
+    UserDB.getById(id)
+    .then(user => {
+        console.log(`user`, user)
+        if(user) {
+            UserDB.update(id, req.body)
+           .then (response => {
+               if (response === 1) {
+                UserDB.getById(id)
+                .then(updatedUser =>
+                    res.status(200).json(updatedUser)
+                )
+               } else {
+                   res.status(500).json({error: 'error user not correctly updated'})
+               }
+           }).catch (error =>
+                res.status(500).json({error: `Server error could not update data error: ${error}`})
+           )
+        } else {
+            res.status(404).json({Messgae: `user with given id does not exist`})
+        }
+    }).catch (error =>
+        res.status(500).json({error: `Server error could not update data error: ${error}`})
+    )
+}); 
 
 //custom middleware
 
