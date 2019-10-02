@@ -32,8 +32,14 @@ router.get('/:id/posts', (req, res) => {
 
 });
 
-router.delete('/:id', (req, res) => {
-
+router.delete('/:id', validateUserId, (req, res) => {
+    UserDB.getById(req.params.id)
+    .then(user => {
+        UserDB.remove(user)
+        res.status(201).json({Message: 'user deleted'})
+    }).catch(error =>
+    res.status(500).json({error: `Server error, could not delete user error: ${error}`})
+    )
 });
 
 router.put('/:id', validateUserId, (req, res) => {
@@ -57,17 +63,17 @@ router.put('/:id', validateUserId, (req, res) => {
 
 function validateUserId(req, res, next) {
     const id = req.params.id
-    console.log(id)
+    // console.log(id)
     UserDB.getById(id)
     .then(user => {
-        console.log(`user`, user)
+        // console.log(`user`, user)
         if(user) {
             next();
         } else {
             res.status(404).json({Messgae: "invalid user id"})
         }
     }).catch (error =>
-        res.status(500).json({error: `Server error could not update data error: ${error}`})
+        res.status(500).json({error: `Server error: ${error}`})
     )
 };
 
