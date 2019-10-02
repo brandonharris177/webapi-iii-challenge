@@ -16,12 +16,20 @@ router.get('/', (req, res) => {
     UserDB.get().then(users => {
         res.status(200).json(users)
     }).catch(error =>
-        res.status(500).json({error: 'Server error could not get data'})
+        res.status(500).json({error: `Server error could not get data error: ${error}`})
     )
 });
 
 router.get('/:id', (req, res) => {
-
+    UserDB.getById(req.params.id).then(user => {
+        if (user) {
+            res.status(200).json(user)
+        } else {
+            res.status(404).json({Messgae: `user with given id does not exist`})
+        }
+    }).catch(error =>
+        res.status(500).json({error: `Server error could not get data error: ${error}`})
+    )
 });
 
 router.get('/:id/posts', (req, res) => {
