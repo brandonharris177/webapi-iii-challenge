@@ -92,11 +92,16 @@ function validateUserId(req, res, next) {
 };
 
 function validateUser(req, res, next) {
-    if (req.body.name) {
-        next ();
+    if (req.body) {
+        if (req.body.name) {
+            next ();
+        } else {
+            res.status(400).json({ message: "missing required name field"  })
+        }
     } else {
         res.status(400).json({ message: "missing user data" })
     }
+    
 };
 
 function validatePost(req, res, next) {
